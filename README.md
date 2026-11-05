@@ -33,14 +33,6 @@ that they live in a normal desktop app instead of a shell-hosted WebView.
 </tr>
 </table>
 
-## Related projects
-
-- **[dumbie/RDNA Panelr](https://github.com/dumbie/RDNA Panelr)** — an independent project with a very
-  similar goal (an Adrenalin alternative for driver-only installs). RDNA Panel is **not** affiliated with
-  it; the names differ by one letter, so make sure you are looking at the one you want.
-  This project's focus is live multi-GPU monitoring (one full panel per card), per-game profiles,
-  bilingual UI, and single-instance/tray behaviour. Both talk to ADLX/ADL directly.
-
 ## Why this exists
 
 RDNA Panel is **not** an overclocking toy — it is a replacement for the vendor's driver control panel,
@@ -155,14 +147,6 @@ MIT — see [LICENSE](LICENSE).
 RDNA Panel 是一个紧凑的 WPF（.NET 8）控制面板，通过原生核心 `rt_core.dll`（ADLX/ADL）直接与驱动交互，
 把官方面板里同样的控制项集中到一处（没有隐藏开关）：超频偏移、风扇曲线、显示模式、3D 功能开关，以及多卡实时监控。这些都不是隐藏开关——
 它们与官方面板提供的控制项相同，区别只在于它们待在一个普通桌面程序里，而不是 shell 宿主的 WebView 里。
-
-## 相关项目
-
-- **[dumbie/RDNA Panelr](https://github.com/dumbie/RDNA Panelr)** —— 一个目标非常接近的独立项目
-  （面向 driver-only 用户的 Adrenalin 替代品）。RDNA Panel 与它**没有关联**，名字只差一个字母，
-  注意别弄混。
-  本项目的侧重是：多卡实时监控（每卡一整块面板）、按游戏配置、中英文界面、单实例与托盘行为。
-  两者都是直接与 ADLX/ADL 交互。
 
 ## 为什么做这个
 
