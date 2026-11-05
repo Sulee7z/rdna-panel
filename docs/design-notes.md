@@ -58,6 +58,12 @@ failure mode cannot be corrected from user space. RadeonTune therefore does **no
 overclocking, memory voltage or timing tuning: a feature that would look fine in a stress test and then
 drop the display at a load change is worse than no feature.
 
+**Severity, as observed on the target machine:** when it happens, **Windows' TDR does not fire**. There is
+no driver reset, no recovery dialog, no automatic restore — the display simply stays dead. The only way
+back is a **forced power cycle**, and in the bad cases **boot into Safe Mode and uninstall the driver**
+before the card comes back. A failure mode that cannot be recovered from by the OS watchdog is the reason
+this feature is not offered at all, not merely tuned conservatively.
+
 If someone revisits this: the primary variable is RLL/droop, not the clock offset, and the experiment
 needs a fallback display path (iGPU / second GPU) plus a recovery procedure.
 
