@@ -5,7 +5,7 @@
 **A lightweight tuning & monitoring panel for AMD Radeon GPUs (RDNA4 / RX 9070 tested), built on ADLX/ADL.**
 
 RadeonTune is a compact WPF (.NET 8) control panel for AMD Radeon graphics cards. It talks to the driver
-through a small native core (`rt_core.dll`, ADLX/ADL) and exposes the settings AMD's own software buries —
+through a small native core (`rt_core.dll`, ADLX/ADL) and exposes the same controls the vendor panel has, without its shell/WebView stack —
 overclocking offsets, fan curve, display modes, 3D feature switches, and live multi-GPU monitoring.
 
 ![Home](docs/home.png)

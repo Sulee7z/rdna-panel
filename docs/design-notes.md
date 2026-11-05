@@ -6,42 +6,55 @@ observations, which are analysis, and which are inference.
 Status legend: **Observed** = reproduced locally; **Analysis** = reasoned from how the software is
 built; **Inference** = plausible but NOT measured.
 
-## 1. Why replace the vendor panel instead of extending it
+## 1. The vendor panel: what actually hangs on Explorer
 
-- **Analysis — the vendor panel is a WebView2/browser front end hosted by the Windows shell.**
-  Its window is owned by the shell process, its UI is HTML/JS rendered by WebView2, and its data
-  comes from a local service. Consequences:
-  - restarting Explorer takes the panel with it;
-  - a wedged WebView2 process leaves the panel blank or unresponsive;
-  - the panel cannot be driven reliably from automation.
-- **Observed (by the author, on the target machine): the panel occasionally fails to open or shows a
-  blank surface until the shell/WebView2 state is reset.**
-- **Observed: overclocking presets stored by the driver's profile mechanism get overwritten or cleared**
-  after driver updates, profile reloads, or panel re-initialisation. Values that were applied are not
-  guaranteed to come back.
+**Observed on the target machine (module list of `explorer.exe`):**
 
-RadeonTune's answer is structural, not cosmetic: a native ADLX/ADL core, a plain WPF UI with no WebView,
-and presets stored in files the tool owns (`data/presets.json`).
+- `amdihk64.dll` is loaded into `explorer.exe` and registered as **"Radeon Settings: Host Service"**,
+  CLSID `{CCB5F028-A16A-4F57-B8FA-CF5A6E1A8507}`.
+- That DLL is the host for the desktop right-click entry ("AMD Software: Adrenalin Edition") and part of
+  the hotkey handling. It has to live inside `explorer.exe` because that is how shell extensions work.
+- `amdxc64.dll` / `atidxx64.dll` / `amdenc64.dll` in the same process are D3D/encoder UMds — every D3D
+  program loads those, that part is normal.
 
-## 2. Why there is no VRAM overclocking
+**Consequence:** a fault in the shell extension takes `explorer.exe` down with it — the desktop flashes
+and reloads. After restarting Explorer the AMD entry is gone until the Adrenalin service re-injects it.
 
-**Status: inference, not measurement.** No VRAM overclocking experiment was run on this project, and
-no black/white screen was produced by this tool.
+**Correction to an earlier oversimplification:** the *panel itself* (`RadeonSoftware.exe`) is a separate
+process. "The panel hangs on Explorer" is true for its **entry points** (context menu, hotkeys), not for
+the whole application.
 
-The reasoning is:
+**Presets:** the overclocking presets are stored by the driver's profile mechanism and get overwritten or
+cleared after driver updates, profile reloads, or panel re-initialisation — observed repeatedly on the
+target machine.
 
-- A memory clock change on these GPUs forces a **UCLK switch** (the memory controller changes its
-  operating point rather than running at a single fixed frequency).
-- The driver pairs that with its own **anti-droop / load-line style voltage regulation**.
-- The combination of a dynamic memory clock and that regulation loop is the classic source of
-  display-link instability (black screen, white screen) when it goes wrong.
+RadeonTune's answer is structural: native ADLX/ADL core, plain WPF UI, presets in files the tool owns.
 
-Because the failure mode is hard to bound and would require many risky experiments on the user's only
-GPU, the feature was left out on purpose. Core clock, power limit, voltage offset and the fan curve do
-not require UCLK switching and are implemented.
+## 2. Why there is no VRAM overclocking: transient droop, not steady-state voltage
 
-If someone later wants to revisit VRAM tuning, the experiment must be designed with a fallback display
-path (iGPU or second GPU output) and a documented recovery procedure — not added casually.
+The relevant failure mode for memory tuning on these cards is **"it dies at load change / at the moment
+the memory clock switches"** — that is a **transient droop** problem, not a steady-state undervolt.
+
+- The driver's voltage offset is **static**; it cannot change the droop curve.
+- The droop curve is set by the **VRM's load-line (RLL)**, plus IDROOP and TRIM behaviour.
+- That is exactly why a memory overclock that looks fine at idle can black/white-screen the moment the
+  UCLK switches under load.
+
+**External data point (hardwareluxx forum thread, single case, not reproduced here):**
+
+```
+RLL 1.196 -> 1.296 (more droop, less overshoot)
+Max Droop Compensation 25 mV -> 20 mV
+Result: stable memory clock 2880 -> 2960 MHz
+The 10 mV offset change (1.345 -> 1.335) was secondary; the droop tuning did the work.
+```
+
+**Status:** architectural reasoning plus one external case. This project did **not** run VRAM
+overclocking experiments and did not produce those screens; the feature is absent on purpose, because
+the failure mode needs VRM-level tuning the driver does not expose.
+
+If someone revisits VRAM tuning: design it with a fallback display path (iGPU / second GPU) and a
+recovery procedure, and treat RLL/droop as the primary variable, not the clock offset.
 
 ## 3. Where these notes come from
 
