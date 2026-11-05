@@ -1,5 +1,7 @@
 # RadeonTune
 
+**English** | [简体中文](README.zh-CN.md)
+
 **A lightweight tuning & monitoring panel for AMD Radeon GPUs (RDNA4 / RX 9070 tested), built on ADLX/ADL.**
 
 RadeonTune is a compact WPF (.NET 8) control panel for AMD Radeon graphics cards. It talks to the driver

@@ -1,5 +1,7 @@
 # RadeonTune
 
+[English](README.md) | **简体中文**
+
 **面向 AMD Radeon 显卡（RDNA4 / 已在 RX 9070 验证）的轻量调优与监控面板，基于 ADLX/ADL。**
 
 RadeonTune 是一个紧凑的 WPF（.NET 8）控制面板，通过原生核心 `rt_core.dll`（ADLX/ADL）直接与驱动交互，
