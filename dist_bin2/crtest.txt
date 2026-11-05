@@ -1,1 +1,0 @@
-create rc=0 count=1 [2560,1440,60;] delete rc=0 count_after=0

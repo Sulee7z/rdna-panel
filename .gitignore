@@ -1,6 +1,8 @@
-bin/
+﻿bin/
 obj/
 dist/
+dist-next/
+dist_bin2/
 packaging/
 release/
 .rt-versions/
@@ -8,3 +10,4 @@ data/
 *.user
 *.suo
 .vs/
+research/

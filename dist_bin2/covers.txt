@@ -1,5 +1,0 @@
-Genshin: migrated cover -> C:\Users\4521\Documents\deepseek-harness\default-workspace\RadeonTune\dist\data\covers\custom_D8E6EC68EA5A91A4.png
-Cyberpunk 2077: C:\Users\4521\Documents\deepseek-harness\default-workspace\RadeonTune\dist\data\covers\1091500.jpg (34342 bytes)
-3DMark: C:\Users\4521\Documents\deepseek-harness\default-workspace\RadeonTune\dist\data\covers\223850.jpg (38215 bytes)
-PRAGMATA: C:\Users\4521\Documents\deepseek-harness\default-workspace\RadeonTune\dist\data\covers\3357650.jpg (41096 bytes)
-Genshin: C:\Users\4521\Documents\deepseek-harness\default-workspace\RadeonTune\dist\data\covers\custom_D8E6EC68EA5A91A4.png (339428 bytes)
