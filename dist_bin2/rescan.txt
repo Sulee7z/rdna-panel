@@ -1,0 +1,2 @@
+Genshin: C:\Games\Mihoyo\Genshin\uninstall.exe -> C:\Games\Mihoyo\Genshin\games\Genshin Impact Game\YuanShen.exe
+  cover: C:\Users\4521\Documents\deepseek-harness\default-workspace\RadeonTune\dist\data\covers\manual_D8E6EC68EA5A91A4.png

@@ -1,0 +1,5 @@
+before: freq=-200 power=10 volt=-135
+apply rc ok=True detail=
+after apply: -500|1000|-195|-30|10|10 volt=-200|0|-130|0
+restore ok=True detail=
+final: -500|1000|-200|-30|10|10 volt=-200|0|-135|0

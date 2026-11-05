@@ -1,0 +1,4 @@
+std=0 pclk=247350 hTot=2752 vTot=1498 create_rc=0 count=1
+std=1 pclk=238272 hTot=2720 vTot=1460 create_rc=0 count=1
+std=2 pclk=308902 hTot=3405 vTot=1512 create_rc=0 count=1
+std=4 pclk=241699 hTot=2720 vTot=1481 create_rc=0 count=1

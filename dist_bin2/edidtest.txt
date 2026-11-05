@@ -1,0 +1,7 @@
+name=27G2T range=48-65Hz maxPixClk=1300MHz
+DTD 2560x1440@60.00 pclk=241690 hTot=2720 vTot=1481
+2560x1440@60 pclk=238272 -> accept
+2560x1440@320 pclk=1270784 -> accept
+2560x1440@400 pclk=1588480 -> REJECT: 刷新率 400 Hz 超过该分辨率上限 320 Hz; 像素时钟 1588.5 MHz 超过 EDID 上限 1300 MHz
+1920x1080@75 pclk=171600 -> accept
+3840x2160@60 pclk=523200 -> accept

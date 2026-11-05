@@ -1,0 +1,74 @@
+# RadeonTune
+
+**A lightweight tuning & monitoring panel for AMD Radeon GPUs (RDNA4 / RX 9070 tested), built on ADLX/ADL.**
+
+RadeonTune is a compact WPF (.NET 8) control panel for AMD Radeon graphics cards. It talks to the driver
+through a small native core (`rt_core.dll`, ADLX/ADL) and exposes the settings AMD's own software buries —
+overclocking offsets, fan curve, display modes, 3D feature switches, and live multi-GPU monitoring.
+
+![Home](docs/home.png)
+
+## Features
+
+- **Live monitoring** — core/VRAM clock, edge & hotspot temperature, VRAM temperature, board power,
+  GPU voltage, fan RPM, GFX activity. One full panel per GPU; multi-GPU systems show every card.
+- **Multi-GPU** — pick the active card with one click; the choice is remembered. Monitoring of idle
+  cards can be disabled to keep CPU package C-states intact.
+- **Overclocking** — core clock limit, power limit, voltage offset, 5-point fan curve, zero-RPM,
+  save/apply presets, apply-at-startup, one-click revert.
+- **Display** — resolution & refresh rate switching with a 15-second confirm/rollback guard,
+  color depth, pixel format, GPU scaling, VSR, custom resolutions.
+- **3D / graphics** — Anti-Lag, Boost, Chill, Enhanced Sync, FRTC, RSR upscaling & sharpness,
+  Image Sharpening 2, FSR upscaling / frame generation, AFMF switches.
+- **Profiles** — global and per-game profiles, process-based auto-apply, cover art.
+- **Quality of life** — tray icon (always resident), close-to-tray with rememberable choice,
+  start with Windows (with configurable delay), single instance, Chinese/English UI.
+
+## Install
+
+### Installer (recommended)
+
+1. Download `RadeonTune-Setup-v1.2.6-win-x64.zip` and extract it.
+2. Run `setup.cmd`.
+3. It installs to `%LOCALAPPDATA%\Programs\RadeonTune`, creates Start Menu / Desktop shortcuts and an
+   uninstall entry (Apps & Features). No admin rights required.
+4. To remove: run `uninstall.ps1` from the install folder, or use Apps & Features.
+
+### Portable
+
+1. Download `RadeonTune-v1.2.6-portable-win-x64.zip` and extract anywhere.
+2. Run `RadeonTune.exe`. Settings live in `data\settings.json` next to the executable.
+
+Requirements: Windows 10/11 x64, an AMD Radeon GPU with a recent Adrenalin driver.
+Self-contained build — no .NET runtime installation needed.
+
+## Usage notes
+
+- Overclocking writes go through ADLX; values are validated against driver limits. Use at your own risk.
+- Display mode changes show a confirmation dialog and roll back automatically after 15 s.
+- Multi-GPU: the selected card is used for tuning pages; monitoring can cover all cards.
+- Language can be switched at any time in **Profiles → Language**.
+
+## Build from source
+
+```
+dotnet publish RadeonTune/RadeonTune.csproj -c Release -r win-x64 --self-contained true `
+  -p:PublishSingleFile=false -o RadeonTune/dist
+```
+
+The native core `rt_core.dll` is built from `RadeonTune/native/rt_core.cpp` with mingw-w64
+(ADLX SDK headers required and not bundled):
+
+```
+g++ -std=c++17 -O2 -shared -static -I <ADLX>/Include -I <ADLX>/ADLXHelper/Windows/Cpp `
+  RadeonTune/native/rt_core.cpp <ADLX>/ADLXHelper.cpp adlx_shim.cpp -o rt_core.dll -ladvapi32
+```
+
+## Status
+
+Early but functional. Verified on Radeon RX 9070 (Navi 48) + iGPU. Other RDNA2/3 cards should work
+through the same ADLX interfaces but are untested.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

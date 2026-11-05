@@ -1,0 +1,11 @@
+[1] clean apply
+    apply ok=True action=applied
+[2] simulated crash while applying
+    judge -> replay (selftest strikes=1)
+[3] simulated crash while applying
+    judge -> downgrade_then_replay (selftest strikes=2)
+[4] simulated crash while applying
+    judge -> quarantine (selftest)
+[5] gate
+    gate -> clear (newestEvent=1793785948 lastApply=1793821899)
+[6] strikes=3 quarantined=[selftest]

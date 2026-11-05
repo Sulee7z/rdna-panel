@@ -1,0 +1,4 @@
+2026-11-05T04:10:49 stage=startup
+2026-11-05T04:10:49 start args=[--shot C:\Users\4521\Documents\deepseek-harness\default-workspace\RadeonTune\dist-next\shot-next.png --page games] safe=False renderMode=hardware
+2026-11-05T04:10:49 stage=creating-window
+2026-11-05T04:10:50 stage=window-shown

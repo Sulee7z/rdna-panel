@@ -1,0 +1,4 @@
+steam	Cyberpunk 2077	c:\program files (x86)\steam\steamapps\common\Cyberpunk 2077\bin\x64\Cyberpunk2077.exe
+steam	3DMark	c:\program files (x86)\steam\steamapps\common\3DMark\bin\x64\3DMark.exe
+steam	PRAGMATA	c:\program files (x86)\steam\steamapps\common\PRAGMATA\PRAGMATA.exe
+count=3
