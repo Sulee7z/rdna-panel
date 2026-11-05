@@ -30,8 +30,8 @@ overclocking offsets, fan curve, display modes, 3D feature switches, and live mu
 
 ### Installer (recommended)
 
-1. Download `RadeonTune-Setup-v1.2.6-win-x64.zip` and extract it.
-2. Run `setup.cmd`.
+1. Download `RadeonTune-Setup-1.2.6.exe` and run it.
+2. The installer is per-user (no admin), adds Start Menu / Desktop shortcuts and an uninstall entry.
 3. It installs to `%LOCALAPPDATA%\Programs\RadeonTune`, creates Start Menu / Desktop shortcuts and an
    uninstall entry (Apps & Features). No admin rights required.
 4. To remove: run `uninstall.ps1` from the install folder, or use Apps & Features.

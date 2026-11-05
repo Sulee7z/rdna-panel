@@ -26,8 +26,8 @@ RadeonTune 是一个紧凑的 WPF（.NET 8）控制面板，通过原生核心 `
 
 ### 安装版（推荐）
 
-1. 下载 `RadeonTune-Setup-v1.2.6-win-x64.zip` 并解压；
-2. 运行 `setup.cmd`；
+1. 下载 `RadeonTune-Setup-1.2.6.exe` 直接运行；
+2. 安装到当前用户（无需管理员），自动创建开始菜单/桌面快捷方式与卸载项；
 3. 安装到 `%LOCALAPPDATA%\Programs\RadeonTune`，创建开始菜单/桌面快捷方式与卸载项，无需管理员权限；
 4. 卸载：运行安装目录里的 `uninstall.ps1`，或在“应用和功能”里卸载。
 
