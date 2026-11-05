@@ -10,6 +10,35 @@ overclocking offsets, fan curve, display modes, 3D feature switches, and live mu
 
 ![Home](docs/home.png)
 
+## Why this exists
+
+RadeonTune is **not** an overclocking toy — it is a replacement for the vendor's driver control panel,
+because that panel is unreliable by construction:
+
+- It is a **browser-based front end hosted inside Explorer**. When Explorer restarts, hangs, or the
+  WebView stack misbehaves, the panel disappears, goes blank, or refuses to reopen.
+- Its **overclocking presets are stored by the driver's own mechanism**, and that storage gets
+  silently overwritten or cleared — after driver updates, profile reloads, or when the panel itself
+  re-initialises. Tuned values simply vanish.
+
+RadeonTune avoids both failure modes: a small native core (`rt_core.dll`) talks to ADLX/ADL directly,
+the UI is plain WPF with no WebView and no Explorer dependency, and presets live in your own files
+(`data\presets.json`, `data\settings.json`) that nothing else rewrites.
+
+## What it deliberately does not do
+
+**No VRAM overclocking, no memory voltage or timing tuning.** On these GPUs a memory clock change
+forces UCLK switching, and together with the driver's anti-droop (LLC) behaviour that combination is
+extremely unstable — black screens and white screens. This was measured on Samsung GDDR6 modules
+before this tool existed; the conclusion is documented and the feature is intentionally absent.
+Core clock, power limit, voltage offset and the fan curve are safe to tune; memory is not.
+
+## Recommended setup
+
+Install the AMD driver with the **"Driver Only"** option (skip the bundled control panel). You get the
+kernel driver and ADLX, but not the unstable WebView panel — RadeonTune provides the controls you
+actually use, and the machine stays free of the panel's Explorer coupling.
+
 ## Features
 
 - **Live monitoring** — core/VRAM clock, edge & hotspot temperature, VRAM temperature, board power,
