@@ -16,7 +16,30 @@ overclocking offsets, fan curve, display modes, 3D feature switches, and live mu
 None of these are secret switches: they are the same controls the vendor panel offers — the difference is
 that they live in a normal desktop app instead of a shell-hosted WebView.
 
-![Home](docs/home.png)
+## Screenshots
+
+<table>
+<tr>
+  <td width="50%"><img src="docs/home.png" alt="Home / monitoring"><br><sub><b>Home</b> — per-GPU panels, one row per card</sub></td>
+  <td width="50%"><img src="docs/graphics.png" alt="Graphics settings"><br><sub><b>Graphics</b> — Anti-Lag, Boost, RSR, FSR, AFMF</sub></td>
+</tr>
+<tr>
+  <td><img src="docs/display.png" alt="Display settings"><br><sub><b>Display</b> — resolution, refresh rate, bit depth, VRR</sub></td>
+  <td><img src="docs/overclocking.png" alt="Overclocking"><br><sub><b>Overclocking</b> — clock limit, power limit, voltage offset, fan curve</sub></td>
+</tr>
+<tr>
+  <td><img src="docs/profiles.png" alt="Profiles"><br><sub><b>Profiles</b> — per-game profiles, autostart, close behaviour, language</sub></td>
+  <td></td>
+</tr>
+</table>
+
+## Related projects
+
+- **[dumbie/RadeonTuner](https://github.com/dumbie/RadeonTuner)** — an independent project with a very
+  similar goal (an Adrenalin alternative for driver-only installs). RadeonTune is **not** affiliated with
+  it; the names differ by one letter, so make sure you are looking at the one you want.
+  This project's focus is live multi-GPU monitoring (one full panel per card), per-game profiles,
+  bilingual UI, and single-instance/tray behaviour. Both talk to ADLX/ADL directly.
 
 ## Why this exists
 
@@ -133,7 +156,13 @@ RadeonTune 是一个紧凑的 WPF（.NET 8）控制面板，通过原生核心 `
 把官方面板里同样的控制项集中到一处（没有隐藏开关）：超频偏移、风扇曲线、显示模式、3D 功能开关，以及多卡实时监控。这些都不是隐藏开关——
 它们与官方面板提供的控制项相同，区别只在于它们待在一个普通桌面程序里，而不是 shell 宿主的 WebView 里。
 
-![首页](docs/home.png)
+## 相关项目
+
+- **[dumbie/RadeonTuner](https://github.com/dumbie/RadeonTuner)** —— 一个目标非常接近的独立项目
+  （面向 driver-only 用户的 Adrenalin 替代品）。RadeonTune 与它**没有关联**，名字只差一个字母，
+  注意别弄混。
+  本项目的侧重是：多卡实时监控（每卡一整块面板）、按游戏配置、中英文界面、单实例与托盘行为。
+  两者都是直接与 ADLX/ADL 交互。
 
 ## 为什么做这个
 
