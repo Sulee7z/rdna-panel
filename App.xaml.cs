@@ -558,10 +558,10 @@ namespace RadeonTune
             MainWindow = window;
             if (StartMinimized)
             {
+                TrayHost.Attach(window);   // 先建托盘图标，再隐藏窗口
                 window.ShowInTaskbar = false;
                 window.WindowState = WindowState.Minimized;
                 window.Hide();
-                TrayHost.Attach(window);
             }
             else
             {
