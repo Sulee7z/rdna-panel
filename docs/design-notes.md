@@ -44,6 +44,8 @@ That question started the investigation. Two facts came out of it:
 1. The failing moment is the **transition**, i.e. a **transient droop** problem, not a steady-state
    voltage deficit. The driver's voltage offset is **static**; it cannot change the droop curve.
 2. The droop curve is governed by the **VRM load-line (RLL)**, together with IDROOP and TRIM behaviour.
+   Crucially, RLL/droop is **not a driver-side setting**: it is a VRM-controller parameter reached over
+   **I2C/SMBus** (or fixed in the board **BIOS**), which is why the graphics driver cannot expose or change it.
 
 **External data point** — [hardwareluxx: Offizieller AMD RX 9070 (XT) Overclocking und Modding Thread, p.68](https://www.hardwareluxx.de/community/threads/offizieller-amd-rx-9070-xt-overclocking-und-modding-thread.1364991/page-68)
 (post by user *RedF*; a single case, not reproduced here):
@@ -56,8 +58,8 @@ The 10 mV offset change (1.345 -> 1.335) was secondary; the droop tuning did the
 ```
 
 **This is not a tuning gap that the tool can paper over.** It is an AMD-side issue that has persisted
-from **RDNA3 through RDNA4 and remains unfixed**; the driver exposes no RLL/IDROOP control, so the
-failure mode cannot be corrected from user space. RDNA Panel therefore does **not** offer VRAM
+from **RDNA3 through RDNA4 and remains unfixed**. The droop curve lives in the VRM (I2C register) or the
+BIOS, not in the driver — so it cannot be corrected from an application at all. RDNA Panel therefore does **not** offer VRAM
 overclocking, memory voltage or timing tuning: a feature that would look fine in a stress test and then
 drop the display at a load change is worse than no feature.
 

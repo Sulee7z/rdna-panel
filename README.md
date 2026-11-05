@@ -56,8 +56,8 @@ forces a UCLK switch, and combined with the driver's anti-droop (LLC) regulation
 source of display-link instability (black/white screens).
 
 **This is a known AMD issue, unfixed from RDNA3 through RDNA4:** a memory overclock passes stress tests
-and then drops the display at idle ↔ load transitions. The driver exposes no load-line / droop control, so
-it cannot be corrected from user space. It does not even trigger TDR — recovery means a forced power cycle,
+and then drops the display at idle ↔ load transitions. Load-line / droop lives in the VRM (I2C register) or the
+BIOS, not in the driver, so no application can correct it. It does not even trigger TDR — recovery means a forced power cycle,
 sometimes Safe Mode plus a driver uninstall. That is why the feature is absent rather than unfinished.
 See [docs/design-notes.md](docs/design-notes.md) for the full reasoning and the status of each claim.
 

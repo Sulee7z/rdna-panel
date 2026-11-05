@@ -36,7 +36,9 @@ RDNA Panel 的应对是结构性的：原生 ADLX/ADL 核心、纯 WPF 界面、
 这个疑问才引出了后面的调研。调研得出两点：
 
 1. 崩的瞬间是**切换**，也就是**瞬态掉压（transient droop）**，不是稳态电压不够。驱动侧电压偏移是**静态**的，改不了掉压曲线。
-2. 掉压曲线由 **VRM 的 load-line（RLL）** 决定，另外还涉及 IDROOP 与 TRIM。
+2. 掉压曲线由 **VRM 的 load-line（RLL）** 决定，另外还涉及 IDROOP 与 TRIM。关键在于：RLL/掉压
+   **不是驱动侧设置**，而是通过 **I2C/SMBus** 访问的 VRM 控制器参数（或在主板 **BIOS** 里固定），
+   所以驱动根本无法暴露或修改它。
 
 **外部数据点** —— [hardwareluxx：Offizieller AMD RX 9070 (XT) Overclocking und Modding Thread 第 68 页](https://www.hardwareluxx.de/community/threads/offizieller-amd-rx-9070-xt-overclocking-und-modding-thread.1364991/page-68)
 （用户 *RedF* 的帖子；单个案例，本项目未复现）：
@@ -48,8 +50,8 @@ Max Droop Compensation 25 mV -> 20 mV
 他降的那 10 mV（1.345 -> 1.335）只是配菜，主角是把瞬态调平。
 ```
 
-**这不是本工具能绕过的调参缺口。** 它是 AMD 侧的问题，从 **RDNA3 一直延续到 RDNA4，至今未修**；
-驱动不暴露 RLL/IDROOP 控制，用户态无法修正这个失效模式。因此 RDNA Panel **不提供**显存超频、
+**这不是本工具能绕过的调参缺口。** 它是 AMD 侧的问题，从 **RDNA3 一直延续到 RDNA4，至今未修**。
+掉压曲线在 VRM（I2C 寄存器）或 BIOS 里，不在驱动里——所以任何应用程序都无法修正它。因此 RDNA Panel **不提供**显存超频、
 显存电压与时序调节：一个能过压力测试、却在负载切换时掉显示的功能，比没有更糟。
 
 **严重程度（本机观察）**：一旦发生，**Windows 的 TDR 不会触发**——没有驱动重置、没有恢复提示、没有自动还原，
