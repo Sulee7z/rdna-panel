@@ -6,8 +6,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>RadeonTune</AssemblyName>
     <RootNamespace>RadeonTune</RootNamespace>
+    <AssemblyName>RDNAPanel</AssemblyName>
+    <Product>RDNA Panel</Product>
+    <AssemblyTitle>RDNA Panel</AssemblyTitle>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>

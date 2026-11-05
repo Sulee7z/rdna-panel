@@ -677,7 +677,7 @@ namespace RadeonTune
         {
             var win = new Window
             {
-                Title = "关闭 RadeonTune", Width = 430, SizeToContent = SizeToContent.Height,
+                Title = "关闭 RDNA Panel", Width = 430, SizeToContent = SizeToContent.Height,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner, Owner = this,
                 WindowStyle = WindowStyle.ToolWindow, ResizeMode = ResizeMode.NoResize,
                 Background = new SolidColorBrush(Color.FromRgb(0x1C, 0x1C, 0x1E)),

@@ -15,7 +15,7 @@ namespace RadeonTune
         {
             try
             {
-                var dir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RadeonTune");
+                var dir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RDNA Panel");
                 System.IO.Directory.CreateDirectory(dir);
                 System.IO.File.AppendAllText(System.IO.Path.Combine(dir, "tray.log"),
                     $"{DateTime.Now:HH:mm:ss} {msg}{Environment.NewLine}");
@@ -94,7 +94,7 @@ namespace RadeonTune
             _icon = new NotifyIcon
             {
                 Icon = ico,
-                Text = "RadeonTune",
+                Text = "RDNA Panel",
                 Visible = true,
                 ContextMenuStrip = menu,
             };
@@ -121,7 +121,7 @@ namespace RadeonTune
             Log($"hidden to tray, iconVisible={_icon?.Visible}");
             try
             {
-                _icon?.ShowBalloonTip(3000, "RadeonTune", "已最小化到托盘，双击图标恢复", ToolTipIcon.Info);
+                _icon?.ShowBalloonTip(3000, "RDNA Panel", "已最小化到托盘，双击图标恢复", ToolTipIcon.Info);
             }
             catch { }
         }

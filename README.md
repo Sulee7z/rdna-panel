@@ -1,4 +1,4 @@
-# RadeonTune
+# RDNA Panel
 
 **English** | [简体中文](#简体中文)
 
@@ -10,7 +10,7 @@
 
 **A lightweight tuning & monitoring panel for AMD Radeon GPUs (RDNA4 / RX 9070 tested), built on ADLX/ADL.**
 
-RadeonTune is a compact WPF (.NET 8) control panel for AMD Radeon graphics cards. It talks to the driver
+RDNA Panel is a compact WPF (.NET 8) control panel for AMD Radeon graphics cards. It talks to the driver
 through a small native core (`rt_core.dll`, ADLX/ADL) and exposes the same controls the vendor panel has, without its shell/WebView stack —
 overclocking offsets, fan curve, display modes, 3D feature switches, and live multi-GPU monitoring.
 None of these are secret switches: they are the same controls the vendor panel offers — the difference is
@@ -35,15 +35,15 @@ that they live in a normal desktop app instead of a shell-hosted WebView.
 
 ## Related projects
 
-- **[dumbie/RadeonTuner](https://github.com/dumbie/RadeonTuner)** — an independent project with a very
-  similar goal (an Adrenalin alternative for driver-only installs). RadeonTune is **not** affiliated with
+- **[dumbie/RDNA Panelr](https://github.com/dumbie/RDNA Panelr)** — an independent project with a very
+  similar goal (an Adrenalin alternative for driver-only installs). RDNA Panel is **not** affiliated with
   it; the names differ by one letter, so make sure you are looking at the one you want.
   This project's focus is live multi-GPU monitoring (one full panel per card), per-game profiles,
   bilingual UI, and single-instance/tray behaviour. Both talk to ADLX/ADL directly.
 
 ## Why this exists
 
-RadeonTune is **not** an overclocking toy — it is a replacement for the vendor's driver control panel,
+RDNA Panel is **not** an overclocking toy — it is a replacement for the vendor's driver control panel,
 because that panel is unreliable by construction:
 
 - It is a **browser-based front end hosted inside Explorer**. When Explorer restarts, hangs, or the
@@ -52,7 +52,7 @@ because that panel is unreliable by construction:
   silently overwritten or cleared — after driver updates, profile reloads, or when the panel itself
   re-initialises. Tuned values simply vanish.
 
-RadeonTune avoids both failure modes (see [docs/design-notes.md](docs/design-notes.md) for the full
+RDNA Panel avoids both failure modes (see [docs/design-notes.md](docs/design-notes.md) for the full
 analysis and what is observed vs. inferred): a small native core (`rt_core.dll`) talks to ADLX/ADL directly,
 the UI is plain WPF with no WebView and no Explorer dependency, and presets live in your own files
 (`data\presets.json`, `data\settings.json`) that nothing else rewrites.
@@ -72,7 +72,7 @@ See [docs/design-notes.md](docs/design-notes.md) for the full reasoning and the 
 ## Recommended setup
 
 Install the AMD driver with the **"Driver Only"** option (skip the bundled control panel). You get the
-kernel driver and ADLX, but not the unstable WebView panel — RadeonTune provides the controls you
+kernel driver and ADLX, but not the unstable WebView panel — RDNA Panel provides the controls you
 actually use, and the machine stays free of the panel's Explorer coupling.
 
 ## Features
@@ -95,16 +95,16 @@ actually use, and the machine stays free of the panel's Explorer coupling.
 
 ### Installer (recommended)
 
-1. Download `RadeonTune-Setup-1.2.6.exe` and run it.
+1. Download `RDNA Panel-Setup-1.2.6.exe` and run it.
 2. The installer is per-user (no admin), adds Start Menu / Desktop shortcuts and an uninstall entry.
-3. It installs to `%LOCALAPPDATA%\Programs\RadeonTune`, creates Start Menu / Desktop shortcuts and an
+3. It installs to `%LOCALAPPDATA%\Programs\RDNA Panel`, creates Start Menu / Desktop shortcuts and an
    uninstall entry (Apps & Features). No admin rights required.
 4. To remove: run `uninstall.ps1` from the install folder, or use Apps & Features.
 
 ### Portable
 
-1. Download `RadeonTune-v1.2.6-portable-win-x64.zip` and extract anywhere.
-2. Run `RadeonTune.exe`. Settings live in `data\settings.json` next to the executable.
+1. Download `RDNA Panel-v1.2.6-portable-win-x64.zip` and extract anywhere.
+2. Run `RDNA Panel.exe`. Settings live in `data\settings.json` next to the executable.
 
 Requirements: Windows 10/11 x64, an AMD Radeon GPU with a recent Adrenalin driver.
 Self-contained build — no .NET runtime installation needed.
@@ -119,16 +119,16 @@ Self-contained build — no .NET runtime installation needed.
 ## Build from source
 
 ```
-dotnet publish RadeonTune/RadeonTune.csproj -c Release -r win-x64 --self-contained true `
-  -p:PublishSingleFile=false -o RadeonTune/dist
+dotnet publish RDNA Panel/RDNA Panel.csproj -c Release -r win-x64 --self-contained true `
+  -p:PublishSingleFile=false -o RDNA Panel/dist
 ```
 
-The native core `rt_core.dll` is built from `RadeonTune/native/rt_core.cpp` with mingw-w64
+The native core `rt_core.dll` is built from `RDNA Panel/native/rt_core.cpp` with mingw-w64
 (ADLX SDK headers required and not bundled):
 
 ```
 g++ -std=c++17 -O2 -shared -static -I <ADLX>/Include -I <ADLX>/ADLXHelper/Windows/Cpp `
-  RadeonTune/native/rt_core.cpp <ADLX>/ADLXHelper.cpp adlx_shim.cpp -o rt_core.dll -ladvapi32
+  RDNA Panel/native/rt_core.cpp <ADLX>/ADLXHelper.cpp adlx_shim.cpp -o rt_core.dll -ladvapi32
 ```
 
 ## Status
@@ -152,28 +152,28 @@ MIT — see [LICENSE](LICENSE).
 
 **面向 AMD Radeon 显卡（RDNA4 / 已在 RX 9070 验证）的轻量调优与监控面板，基于 ADLX/ADL。**
 
-RadeonTune 是一个紧凑的 WPF（.NET 8）控制面板，通过原生核心 `rt_core.dll`（ADLX/ADL）直接与驱动交互，
+RDNA Panel 是一个紧凑的 WPF（.NET 8）控制面板，通过原生核心 `rt_core.dll`（ADLX/ADL）直接与驱动交互，
 把官方面板里同样的控制项集中到一处（没有隐藏开关）：超频偏移、风扇曲线、显示模式、3D 功能开关，以及多卡实时监控。这些都不是隐藏开关——
 它们与官方面板提供的控制项相同，区别只在于它们待在一个普通桌面程序里，而不是 shell 宿主的 WebView 里。
 
 ## 相关项目
 
-- **[dumbie/RadeonTuner](https://github.com/dumbie/RadeonTuner)** —— 一个目标非常接近的独立项目
-  （面向 driver-only 用户的 Adrenalin 替代品）。RadeonTune 与它**没有关联**，名字只差一个字母，
+- **[dumbie/RDNA Panelr](https://github.com/dumbie/RDNA Panelr)** —— 一个目标非常接近的独立项目
+  （面向 driver-only 用户的 Adrenalin 替代品）。RDNA Panel 与它**没有关联**，名字只差一个字母，
   注意别弄混。
   本项目的侧重是：多卡实时监控（每卡一整块面板）、按游戏配置、中英文界面、单实例与托盘行为。
   两者都是直接与 ADLX/ADL 交互。
 
 ## 为什么做这个
 
-RadeonTune **不是**超频玩具，而是驱动控制面板的替代品——因为那个面板在设计上就不稳定：
+RDNA Panel **不是**超频玩具，而是驱动控制面板的替代品——因为那个面板在设计上就不稳定：
 
 - 它是**依托 Explorer 的浏览器前端**。Explorer 重启、卡住，或 WebView 栈出问题，面板就消失、白屏，
   甚至再也打不开。
 - 它的**超频预设由驱动自己的机制保存**，而这个存储会被静默覆盖或清除——驱动更新、配置重载、
   面板自身重新初始化之后，调好的数值就没了。
 
-RadeonTune 绕开这两个失效点（完整分析与「观察/推理」的区分见
+RDNA Panel 绕开这两个失效点（完整分析与「观察/推理」的区分见
 [docs/design-notes.zh-CN.md](docs/design-notes.zh-CN.md)）：原生核心 `rt_core.dll` 直接调用 ADLX/ADL，界面是纯 WPF，
 不依赖 WebView、不依赖 Explorer；预设保存在自己的文件里（`data\presets.json`、`data\settings.json`），
 没有别的程序会去改写它们。
@@ -191,7 +191,7 @@ RadeonTune 绕开这两个失效点（完整分析与「观察/推理」的区�
 ## 推荐安装方式
 
 安装 AMD 驱动时选择 **「仅驱动」（Driver Only）**，跳过随附的控制面板。这样会装上内核驱动与 ADLX，
-但不装那个不稳定的 WebView 面板——日常需要的控制项由 RadeonTune 提供，系统也不再被面板和 Explorer 绑在一起。
+但不装那个不稳定的 WebView 面板——日常需要的控制项由 RDNA Panel 提供，系统也不再被面板和 Explorer 绑在一起。
 
 ## 功能
 
@@ -210,15 +210,15 @@ RadeonTune 绕开这两个失效点（完整分析与「观察/推理」的区�
 
 ### 安装版（推荐）
 
-1. 下载 `RadeonTune-Setup-1.2.6.exe` 直接运行；
+1. 下载 `RDNA Panel-Setup-1.2.6.exe` 直接运行；
 2. 安装到当前用户（无需管理员），自动创建开始菜单/桌面快捷方式与卸载项；
-3. 安装到 `%LOCALAPPDATA%\Programs\RadeonTune`，创建开始菜单/桌面快捷方式与卸载项，无需管理员权限；
+3. 安装到 `%LOCALAPPDATA%\Programs\RDNA Panel`，创建开始菜单/桌面快捷方式与卸载项，无需管理员权限；
 4. 卸载：运行安装目录里的 `uninstall.ps1`，或在“应用和功能”里卸载。
 
 ### 便携版
 
-1. 下载 `RadeonTune-v1.2.6-portable-win-x64.zip` 解压到任意目录；
-2. 运行 `RadeonTune.exe`，配置保存在同目录 `data\settings.json`。
+1. 下载 `RDNA Panel-v1.2.6-portable-win-x64.zip` 解压到任意目录；
+2. 运行 `RDNA Panel.exe`，配置保存在同目录 `data\settings.json`。
 
 环境要求：Windows 10/11 x64、AMD Radeon 显卡 + 较新的 Adrenalin 驱动。自带运行时，无需另装 .NET。
 
@@ -232,15 +232,15 @@ RadeonTune 绕开这两个失效点（完整分析与「观察/推理」的区�
 ## 从源码构建
 
 ```
-dotnet publish RadeonTune/RadeonTune.csproj -c Release -r win-x64 --self-contained true `
-  -p:PublishSingleFile=false -o RadeonTune/dist
+dotnet publish RDNA Panel/RDNA Panel.csproj -c Release -r win-x64 --self-contained true `
+  -p:PublishSingleFile=false -o RDNA Panel/dist
 ```
 
-原生核心 `rt_core.dll` 由 `RadeonTune/native/rt_core.cpp` 用 mingw-w64 编译（需要 ADLX SDK 头文件，仓库未附带）：
+原生核心 `rt_core.dll` 由 `RDNA Panel/native/rt_core.cpp` 用 mingw-w64 编译（需要 ADLX SDK 头文件，仓库未附带）：
 
 ```
 g++ -std=c++17 -O2 -shared -static -I <ADLX>/Include -I <ADLX>/ADLXHelper/Windows/Cpp `
-  RadeonTune/native/rt_core.cpp <ADLX>/ADLXHelper.cpp adlx_shim.cpp -o rt_core.dll -ladvapi32
+  RDNA Panel/native/rt_core.cpp <ADLX>/ADLXHelper.cpp adlx_shim.cpp -o rt_core.dll -ladvapi32
 ```
 
 ## 状态

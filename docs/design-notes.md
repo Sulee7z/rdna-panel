@@ -1,6 +1,6 @@
 # Design notes and rationale
 
-This file records **why** RadeonTune looks the way it does, and — importantly — which statements are
+This file records **why** RDNA Panel looks the way it does, and — importantly — which statements are
 observations, which are analysis, and which are inference.
 
 Status legend: **Observed** = reproduced locally; **Analysis** = reasoned from how the software is
@@ -28,7 +28,7 @@ the whole application.
 cleared after driver updates, profile reloads, or panel re-initialisation — observed repeatedly on the
 target machine.
 
-RadeonTune's answer is structural: native ADLX/ADL core, plain WPF UI, presets in files the tool owns.
+RDNA Panel's answer is structural: native ADLX/ADL core, plain WPF UI, presets in files the tool owns.
 
 ## 2. Why there is no VRAM overclocking: a symptom AMD has not fixed since RDNA3
 
@@ -57,7 +57,7 @@ The 10 mV offset change (1.345 -> 1.335) was secondary; the droop tuning did the
 
 **This is not a tuning gap that the tool can paper over.** It is an AMD-side issue that has persisted
 from **RDNA3 through RDNA4 and remains unfixed**; the driver exposes no RLL/IDROOP control, so the
-failure mode cannot be corrected from user space. RadeonTune therefore does **not** offer VRAM
+failure mode cannot be corrected from user space. RDNA Panel therefore does **not** offer VRAM
 overclocking, memory voltage or timing tuning: a feature that would look fine in a stress test and then
 drop the display at a load change is worse than no feature.
 
