@@ -45,7 +45,8 @@ That question started the investigation. Two facts came out of it:
    voltage deficit. The driver's voltage offset is **static**; it cannot change the droop curve.
 2. The droop curve is governed by the **VRM load-line (RLL)**, together with IDROOP and TRIM behaviour.
 
-**External data point** (hardwareluxx forum, single case, not reproduced here):
+**External data point** — [hardwareluxx: Offizieller AMD RX 9070 (XT) Overclocking und Modding Thread, p.68](https://www.hardwareluxx.de/community/threads/offizieller-amd-rx-9070-xt-overclocking-und-modding-thread.1364991/page-68)
+(post by user *RedF*; a single case, not reproduced here):
 
 ```
 RLL 1.196 -> 1.296 (more droop, less overshoot)

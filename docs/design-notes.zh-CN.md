@@ -38,7 +38,8 @@ RadeonTune 的应对是结构性的：原生 ADLX/ADL 核心、纯 WPF 界面、
 1. 崩的瞬间是**切换**，也就是**瞬态掉压（transient droop）**，不是稳态电压不够。驱动侧电压偏移是**静态**的，改不了掉压曲线。
 2. 掉压曲线由 **VRM 的 load-line（RLL）** 决定，另外还涉及 IDROOP 与 TRIM。
 
-**外部数据点**（hardwareluxx 论坛，单例，本项目未复现）：
+**外部数据点** —— [hardwareluxx：Offizieller AMD RX 9070 (XT) Overclocking und Modding Thread 第 68 页](https://www.hardwareluxx.de/community/threads/offizieller-amd-rx-9070-xt-overclocking-und-modding-thread.1364991/page-68)
+（用户 *RedF* 的帖子；单个案例，本项目未复现）：
 
 ```
 RLL 1.196 -> 1.296（更多 droop、更少 overshoot）
