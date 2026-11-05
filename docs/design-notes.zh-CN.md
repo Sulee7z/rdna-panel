@@ -32,7 +32,6 @@ RadeonTune 的应对是结构性的：原生 ADLX/ADL 核心、纯 WPF 界面、
 > 热修改显存频率会直接白屏/黑屏——这在 RDNA2 或 N 卡上几乎不会发生。真正致命的是
 > **有负载时切换频率**；空闲与烤鸡反而不受影响。而且白屏之后无法热恢复，只能重启。
 
-（用户原话与时间戳见 `docs/sources/2026-11-04-session.md` 第 C 节，seq 323 / 647 / 1851 / 1960 / 924。）
 
 这个疑问才引出了后面的调研。调研得出两点：
 
@@ -65,18 +64,3 @@ Max Droop Compensation 25 mV -> 20 mV
 - 预设丢失：本机反复出现、用户可见的行为。
 - 显存/UCLK：关于显存频率切换如何执行的架构推理；**明确不是测量**，也不当作测量来表述。
 
-### 出处（2026-11-05 更新）
-
-两段分析都是**本项目自身会话转写的原文**，不是外部出版物；带时间戳与序列号的原文摘录见
-[docs/sources/2026-11-04-session.md](sources/2026-11-04-session.md)：
-
-- 面板分析 —— **2026-11-04 20:08，seq 2650**（`explorer.exe` 模块列表、`amdihk64.dll` 注册为
-  "Radeon Settings: Host Service"、CLSID `{CCB5F028-A16A-4F57-B8FA-CF5A6E1A8507}`）；
-- 瞬态掉压分析 —— **2026-11-04 18:03，seq 2006**（RLL / IDROOP / TRIM 推理）。
-
-转写文件在仓库外：
-`%USERPROFILE%\.dsh\sessions\--C-Users-4521-...--\session-5f46c6c6-...\session.v4.jsonl.zstd`
-（zstd 压缩，需先 `7z x` 解压再检索）。
-
-其中 RLL 1.196→1.296、Max Droop Compensation 25→20 mV、2880→2960 MHz 来自该会话中抓取的
-**hardwareluxx 论坛单个帖子**，属第三方个案，非本机测量。

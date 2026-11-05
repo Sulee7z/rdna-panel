@@ -38,8 +38,6 @@ The starting point was **a symptom, not a theory**:
 > almost never happens. It is **switching the clock under load** that kills it; idle and stress testing are
 > fine. And the display state cannot be recovered without a reboot.
 
-(Verbatim user messages with timestamps: `docs/sources/2026-11-04-session.md`, section C —
-seq 323, 647, 1851, 1960, 924.)
 
 That question started the investigation. Two facts came out of it:
 
@@ -79,20 +77,3 @@ needs a fallback display path (iGPU / second GPU) plus a recovery procedure.
 - VRAM/UCLK: architectural reasoning about how memory clock changes are executed; explicitly **not**
   a measurement, and not presented as one.
 
-### Provenance (updated 2026-11-05)
-
-Both analyses are **verbatim from this project's own session transcript**, not external publications, and
-they are reproduced with message timestamps and sequence numbers in
-[docs/sources/2026-11-04-session.md](sources/2026-11-04-session.md):
-
-- panel analysis — **2026-11-04 20:08, seq 2650** (module list of `explorer.exe`, `amdihk64.dll`
-  registered as "Radeon Settings: Host Service", CLSID `{CCB5F028-A16A-4F57-B8FA-CF5A6E1A8507}`);
-- transient-droop analysis — **2026-11-04 18:03, seq 2006** (RLL / IDROOP / TRIM reasoning).
-
-The transcript lives outside the repo at
-`%USERPROFILE%\.dsh\sessions\--C-Users-4521-...--\session-5f46c6c6-...\session.v4.jsonl.zstd`
-(zstd-compressed; decompress with `7z x` before searching).
-
-The specific numbers (RLL 1.196→1.296, Max Droop Compensation 25→20 mV, 2880→2960 MHz) come from a
-**single hardwareluxx forum post** fetched during that session — a third-party case, not a measurement
-performed here.
