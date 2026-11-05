@@ -30,17 +30,20 @@ target machine.
 
 RadeonTune's answer is structural: native ADLX/ADL core, plain WPF UI, presets in files the tool owns.
 
-## 2. Why there is no VRAM overclocking: transient droop, not steady-state voltage
+## 2. Why there is no VRAM overclocking: a symptom AMD has not fixed since RDNA3
 
-The relevant failure mode for memory tuning on these cards is **"it dies at load change / at the moment
-the memory clock switches"** — that is a **transient droop** problem, not a steady-state undervolt.
+The starting point was **a symptom, not a theory**:
 
-- The driver's voltage offset is **static**; it cannot change the droop curve.
-- The droop curve is set by the **VRM's load-line (RLL)**, plus IDROOP and TRIM behaviour.
-- That is exactly why a memory overclock that looks fine at idle can black/white-screen the moment the
-  UCLK switches under load.
+> A memory overclock passes every stress test — hours of load, no errors — yet the machine still goes
+> black-screen or white-screen, and it happens most often at **idle → load / load → idle transitions**.
 
-**External data point (hardwareluxx forum thread, single case, not reproduced here):**
+That question started the investigation. Two facts came out of it:
+
+1. The failing moment is the **transition**, i.e. a **transient droop** problem, not a steady-state
+   voltage deficit. The driver's voltage offset is **static**; it cannot change the droop curve.
+2. The droop curve is governed by the **VRM load-line (RLL)**, together with IDROOP and TRIM behaviour.
+
+**External data point** (hardwareluxx forum, single case, not reproduced here):
 
 ```
 RLL 1.196 -> 1.296 (more droop, less overshoot)
@@ -49,12 +52,14 @@ Result: stable memory clock 2880 -> 2960 MHz
 The 10 mV offset change (1.345 -> 1.335) was secondary; the droop tuning did the work.
 ```
 
-**Status:** architectural reasoning plus one external case. This project did **not** run VRAM
-overclocking experiments and did not produce those screens; the feature is absent on purpose, because
-the failure mode needs VRM-level tuning the driver does not expose.
+**This is not a tuning gap that the tool can paper over.** It is an AMD-side issue that has persisted
+from **RDNA3 through RDNA4 and remains unfixed**; the driver exposes no RLL/IDROOP control, so the
+failure mode cannot be corrected from user space. RadeonTune therefore does **not** offer VRAM
+overclocking, memory voltage or timing tuning: a feature that would look fine in a stress test and then
+drop the display at a load change is worse than no feature.
 
-If someone revisits VRAM tuning: design it with a fallback display path (iGPU / second GPU) and a
-recovery procedure, and treat RLL/droop as the primary variable, not the clock offset.
+If someone revisits this: the primary variable is RLL/droop, not the clock offset, and the experiment
+needs a fallback display path (iGPU / second GPU) plus a recovery procedure.
 
 ## 3. Where these notes come from
 

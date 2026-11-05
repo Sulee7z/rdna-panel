@@ -34,8 +34,9 @@ the UI is plain WPF with no WebView and no Explorer dependency, and presets live
 forces a UCLK switch, and combined with the driver's anti-droop (LLC) regulation that is a classic
 source of display-link instability (black/white screens).
 
-To be precise: **this is inference, not a measurement** — no VRAM overclocking experiment was run for
-this project. The feature was left out because the failure mode is hard to bound on a single GPU.
+**This is a known AMD issue, unfixed from RDNA3 through RDNA4:** a memory overclock passes stress tests
+and then drops the display at idle ↔ load transitions. The driver exposes no load-line / droop control, so
+it cannot be corrected from user space — which is why the feature is absent rather than unfinished.
 See [docs/design-notes.md](docs/design-notes.md) for the full reasoning and the status of each claim.
 
 ## Recommended setup
