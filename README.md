@@ -21,17 +21,20 @@ because that panel is unreliable by construction:
   silently overwritten or cleared — after driver updates, profile reloads, or when the panel itself
   re-initialises. Tuned values simply vanish.
 
-RadeonTune avoids both failure modes: a small native core (`rt_core.dll`) talks to ADLX/ADL directly,
+RadeonTune avoids both failure modes (see [docs/design-notes.md](docs/design-notes.md) for the full
+analysis and what is observed vs. inferred): a small native core (`rt_core.dll`) talks to ADLX/ADL directly,
 the UI is plain WPF with no WebView and no Explorer dependency, and presets live in your own files
 (`data\presets.json`, `data\settings.json`) that nothing else rewrites.
 
 ## What it deliberately does not do
 
-**No VRAM overclocking, no memory voltage or timing tuning.** On these GPUs a memory clock change
-forces UCLK switching, and together with the driver's anti-droop (LLC) behaviour that combination is
-extremely unstable — black screens and white screens. This was measured on Samsung GDDR6 modules
-before this tool existed; the conclusion is documented and the feature is intentionally absent.
-Core clock, power limit, voltage offset and the fan curve are safe to tune; memory is not.
+**No VRAM overclocking, no memory voltage or timing tuning.** A memory clock change on these GPUs
+forces a UCLK switch, and combined with the driver's anti-droop (LLC) regulation that is a classic
+source of display-link instability (black/white screens).
+
+To be precise: **this is inference, not a measurement** — no VRAM overclocking experiment was run for
+this project. The feature was left out because the failure mode is hard to bound on a single GPU.
+See [docs/design-notes.md](docs/design-notes.md) for the full reasoning and the status of each claim.
 
 ## Recommended setup
 
