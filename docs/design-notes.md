@@ -63,3 +63,20 @@ recovery procedure, and treat RLL/droop as the primary variable, not the clock o
 - Preset loss: repeated, user-visible behaviour on the target machine.
 - VRAM/UCLK: architectural reasoning about how memory clock changes are executed; explicitly **not**
   a measurement, and not presented as one.
+
+### Provenance (updated)
+
+The two analyses above are **not** external publications. Their origin is the author's own investigation on
+**2026-11-04**, recorded as two screenshots in the project chat:
+
+- panel analysis screenshot timestamped `2026-11-04 20:12:17` (module list of `explorer.exe`, the
+  "Radeon Settings: Host Service" registration and its CLSID);
+- transient-droop analysis screenshot timestamped `2026-11-04 18:15:03` (RLL / IDROOP / TRIM reasoning,
+  with the hardwareluxx case numbers).
+
+I searched the local session stores for the original transcript (`C:\Users\4521\.dsh\sessions`,
+`...\storages\session_projcache\sessions`, `...\logs`) and found **no** 11-04 transcript containing
+this text — the session files are zstd-compressed and the only hits were today's session, where I had
+already quoted the text. So the screenshots are the primary record; the numbers inside them
+(RLL 1.196→1.296, Max Droop Compensation 25→20 mV, 2880→2960 MHz) are a **single external case from a
+hardwareluxx forum post**, reproduced from that screenshot, not measured here.
