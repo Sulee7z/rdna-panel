@@ -9,8 +9,8 @@ namespace RadeonTune
     public static class Autostart
     {
         private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-        private const string ValueName = "RadeonTune";
-        private const string TaskName = "RadeonTune-AutoApply";
+        private const string ValueName = "RDNA Panel";
+        private const string TaskName = "RDNAPanel-AutoApply";
         private static string SettingsPath => Path.Combine(Engine.StoreDir, "settings.json");
 
         public class Settings
@@ -62,7 +62,7 @@ namespace RadeonTune
         {
             if (delaySeconds < 0) delaySeconds = 0;
             if (delaySeconds > 3600) delaySeconds = 3600;
-            var exe = Path.Combine(AppContext.BaseDirectory, "RadeonTune.exe");
+            var exe = Path.Combine(AppContext.BaseDirectory, "RDNAPanel.exe");
             if (!File.Exists(exe)) exe = Process.GetCurrentProcess().MainModule.FileName;
             try
             {
