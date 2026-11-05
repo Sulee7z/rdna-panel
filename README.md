@@ -140,7 +140,6 @@ MIT — see [LICENSE](LICENSE).
 
 [English](#english) | **简体中文**
 
-[English](README.md) | **简体中文**
 
 **面向 AMD Radeon 显卡（RDNA4 / 已在 RX 9070 验证）的轻量调优与监控面板，基于 ADLX/ADL。**
 
