@@ -34,8 +34,12 @@ RadeonTune's answer is structural: native ADLX/ADL core, plain WPF UI, presets i
 
 The starting point was **a symptom, not a theory**:
 
-> A memory overclock passes every stress test — hours of load, no errors — yet the machine still goes
-> black-screen or white-screen, and it happens most often at **idle → load / load → idle transitions**.
+> Hot-changing the memory clock goes straight to a white screen / black screen — on RDNA2 or NVIDIA this
+> almost never happens. It is **switching the clock under load** that kills it; idle and stress testing are
+> fine. And the display state cannot be recovered without a reboot.
+
+(Verbatim user messages with timestamps: `docs/sources/2026-11-04-session.md`, section C —
+seq 323, 647, 1851, 1960, 924.)
 
 That question started the investigation. Two facts came out of it:
 
