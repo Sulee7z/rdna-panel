@@ -1,6 +1,6 @@
 # RadeonTune
 
-**English** · [简体中文](#简体中文)　|　[English](#english) · **简体中文**
+**English** | [简体中文](#简体中文)
 
 ---
 
@@ -8,7 +8,6 @@
 
 ## English
 
-**English** | [简体中文](README.zh-CN.md)
 
 **A lightweight tuning & monitoring panel for AMD Radeon GPUs (RDNA4 / RX 9070 tested), built on ADLX/ADL.**
 
