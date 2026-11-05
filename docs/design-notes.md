@@ -64,19 +64,20 @@ recovery procedure, and treat RLL/droop as the primary variable, not the clock o
 - VRAM/UCLK: architectural reasoning about how memory clock changes are executed; explicitly **not**
   a measurement, and not presented as one.
 
-### Provenance (updated)
+### Provenance (updated 2026-11-05)
 
-The two analyses above are **not** external publications. Their origin is the author's own investigation on
-**2026-11-04**, recorded as two screenshots in the project chat:
+Both analyses are **verbatim from this project's own session transcript**, not external publications, and
+they are reproduced with message timestamps and sequence numbers in
+[docs/sources/2026-11-04-session.md](sources/2026-11-04-session.md):
 
-- panel analysis screenshot timestamped `2026-11-04 20:12:17` (module list of `explorer.exe`, the
-  "Radeon Settings: Host Service" registration and its CLSID);
-- transient-droop analysis screenshot timestamped `2026-11-04 18:15:03` (RLL / IDROOP / TRIM reasoning,
-  with the hardwareluxx case numbers).
+- panel analysis — **2026-11-04 20:08, seq 2650** (module list of `explorer.exe`, `amdihk64.dll`
+  registered as "Radeon Settings: Host Service", CLSID `{CCB5F028-A16A-4F57-B8FA-CF5A6E1A8507}`);
+- transient-droop analysis — **2026-11-04 18:03, seq 2006** (RLL / IDROOP / TRIM reasoning).
 
-I searched the local session stores for the original transcript (`C:\Users\4521\.dsh\sessions`,
-`...\storages\session_projcache\sessions`, `...\logs`) and found **no** 11-04 transcript containing
-this text — the session files are zstd-compressed and the only hits were today's session, where I had
-already quoted the text. So the screenshots are the primary record; the numbers inside them
-(RLL 1.196→1.296, Max Droop Compensation 25→20 mV, 2880→2960 MHz) are a **single external case from a
-hardwareluxx forum post**, reproduced from that screenshot, not measured here.
+The transcript lives outside the repo at
+`%USERPROFILE%\.dsh\sessions\--C-Users-4521-...--\session-5f46c6c6-...\session.v4.jsonl.zstd`
+(zstd-compressed; decompress with `7z x` before searching).
+
+The specific numbers (RLL 1.196→1.296, Max Droop Compensation 25→20 mV, 2880→2960 MHz) come from a
+**single hardwareluxx forum post** fetched during that session — a third-party case, not a measurement
+performed here.

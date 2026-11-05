@@ -55,15 +55,18 @@ Max Droop Compensation 25 mV -> 20 mV
 - 预设丢失：本机反复出现、用户可见的行为。
 - 显存/UCLK：关于显存频率切换如何执行的架构推理；**明确不是测量**，也不当作测量来表述。
 
-### 出处（更新）
+### 出处（2026-11-05 更新）
 
-上面两段分析**不是**外部出版物，而是作者本人 **2026-11-04** 的调查记录，以两张截图的形式留在项目会话里：
+两段分析都是**本项目自身会话转写的原文**，不是外部出版物；带时间戳与序列号的原文摘录见
+[docs/sources/2026-11-04-session.md](sources/2026-11-04-session.md)：
 
-- 面板分析截图时间 `2026-11-04 20:12:17`（`explorer.exe` 模块列表、"Radeon Settings: Host Service" 注册与 CLSID）；
-- 瞬态掉压分析截图时间 `2026-11-04 18:15:03`（RLL / IDROOP / TRIM 的推理，以及 hardwareluxx 那组数字）。
+- 面板分析 —— **2026-11-04 20:08，seq 2650**（`explorer.exe` 模块列表、`amdihk64.dll` 注册为
+  "Radeon Settings: Host Service"、CLSID `{CCB5F028-A16A-4F57-B8FA-CF5A6E1A8507}`）；
+- 瞬态掉压分析 —— **2026-11-04 18:03，seq 2006**（RLL / IDROOP / TRIM 推理）。
 
-我在本地会话存储里找过原始记录（`C:\Users\4521\.dsh\sessions`、`...\storages\session_projcache\sessions`、
-`...\logs`）——**没有**找到包含这段文字的 11-04 转写：会话文件是 zstd 压缩的，唯一命中的是今天这次会话
-（因为我已经把内容引用进去了）。所以目前的原始凭据就是那两张截图；其中
-（RLL 1.196→1.296、Max Droop Compensation 25→20 mV、2880→2960 MHz）是
-**hardwareluxx 论坛的单个外部个案**，转引自截图，不是本机测量。
+转写文件在仓库外：
+`%USERPROFILE%\.dsh\sessions\--C-Users-4521-...--\session-5f46c6c6-...\session.v4.jsonl.zstd`
+（zstd 压缩，需先 `7z x` 解压再检索）。
+
+其中 RLL 1.196→1.296、Max Droop Compensation 25→20 mV、2880→2960 MHz 来自该会话中抓取的
+**hardwareluxx 论坛单个帖子**，属第三方个案，非本机测量。
