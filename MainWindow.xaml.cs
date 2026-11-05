@@ -348,7 +348,7 @@ namespace RadeonTune
             }
             catch (Exception ex)
             {
-                MessageBox.Show("提权失败：" + ex.Message, "RadeonTune");
+                MessageBox.Show("提权失败：" + ex.Message, "RDNA Panel");
             }
         }
 
@@ -3113,7 +3113,7 @@ namespace RadeonTune
                 StatusText.Text = "ADLX 初始化失败：" + err;
                 var answer = MessageBox.Show(
                     "无法初始化 ADLX（" + err + "）。\n\n这通常需要管理员权限。\n是否以管理员身份重新启动？",
-                    "RadeonTune", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    "RDNA Panel", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (answer == MessageBoxResult.Yes) RelaunchElevated();
                 return;
             }

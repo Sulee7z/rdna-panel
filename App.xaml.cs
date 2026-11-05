@@ -8,7 +8,7 @@ namespace RadeonTune
     public partial class App : Application
     {
         private static readonly string FlagDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RadeonTune");
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RDNA Panel");
         private static readonly string BootFlag = Path.Combine(FlagDir, "starting.flag");
         private static readonly string SafeFlag = Path.Combine(FlagDir, "safe.flag");
 
@@ -36,7 +36,7 @@ namespace RadeonTune
         private static extern bool PostMessageW(IntPtr h, uint msg, IntPtr w, IntPtr l);
         public const uint WmShowWindow = 0x8000 + 1;   // 自定义：唤醒
 
-        private const string ShowEventName = "RadeonTune.ShowRequest";
+        private const string ShowEventName = "RDNAPanel.ShowRequest";
 
         /// <summary>已有实例：通过命名事件请求它把窗口显示出来。</summary>
         public static void ActivateRunningInstance()
@@ -93,7 +93,7 @@ namespace RadeonTune
         private static bool EnsureSingleInstance(string[] args)
         {
             if (IsCliMode(args)) return true;
-            _instanceMutex = new System.Threading.Mutex(true, "RadeonTune.SingleInstance", out bool created);
+            _instanceMutex = new System.Threading.Mutex(true, "RDNAPanel.SingleInstance", out bool created);
             if (created) return true;
             // 已有一个实例：静默退出。
             // 若是“最小化启动”（开机自启）则绝不去恢复/前置已有窗口，避免开机时弹窗；
@@ -610,7 +610,7 @@ namespace RadeonTune
             {
                 MessageBox.Show("RadeonTune 启动失败：\n\n" + ex.Message + "\n\n位置：" + where +
                                 "\n\n日志：%LOCALAPPDATA%\\RadeonTune\\error.log 或 exe 目录下 error.log",
-                                "RadeonTune", MessageBoxButton.OK, MessageBoxImage.Error);
+                                "RDNA Panel", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch { }
         }

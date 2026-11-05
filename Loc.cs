@@ -151,7 +151,7 @@ namespace RadeonTune
             ["作用域：全局（修改立即生效）"] = "Scope: Global (changes apply immediately)",
             ["保存并获取"] = "Save & read back",
             ["像素格式已切换：{val}"] = "Pixel format switched: {val}",
-            ["关闭 RadeonTune"] = "Close RadeonTune",
+            ["关闭 RDNA Panel"] = "Close RDNA Panel",
             ["创建失败 rc={rc}（时序参数不被驱动接受）"] = "Create failed rc={rc} (timings rejected by the driver)",
             ["删除失败 rc={rc}"] = "Delete failed rc={rc}",
             ["功耗上限允许"] = "Power limit allowed",

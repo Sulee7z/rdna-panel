@@ -37,7 +37,7 @@ namespace RadeonTune
             if (string.IsNullOrEmpty(key)) return null;
 
             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
-            Http.DefaultRequestHeaders.UserAgent.ParseAdd("RadeonTune/1.0");
+            Http.DefaultRequestHeaders.UserAgent.ParseAdd("RDNAPanel/1.0");
 
             var search = await Http.GetStringAsync(
                 "https://www.steamgriddb.com/api/v2/search/autocomplete/" + Uri.EscapeDataString(name));

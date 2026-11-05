@@ -39,7 +39,7 @@ namespace RadeonTune
     public static class Engine
     {
         public static readonly string Dir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RadeonTune");
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RDNA Panel");
         public static readonly string StoreDir = ProbeStoreDir();
         public static readonly string StatePath = Path.Combine(StoreDir, "state.json");
         public static readonly string HistoryPath = Path.Combine(StoreDir, "history.json");
