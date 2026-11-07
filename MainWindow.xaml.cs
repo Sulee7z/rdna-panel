@@ -534,19 +534,47 @@ namespace RadeonTune
         }
 
         private Slider _freqSlider, _powerSlider, _voltSlider, _fanSlider;
+        private Slider _minFreqSlider;
         private TextBlock _fanText;
         private TextBlock _freqText, _powerText, _voltText, _voltSliderText;
+        private TextBlock _freqLabel, _voltLabel, _minFreqText, _minFreqLabel;
         private int _freqMin, _freqMax, _powerMin, _powerMax;
+        // RDNA4 的频率/电压是相对默认值的偏移；RDNA2(6000) 是绝对值，且额外支持最低频率。
+        // 语义由 native 的 rt_oc2_caps 探测，不再按型号硬编码。
+        private bool _freqAbsolute, _voltAbsolute, _minFreqSupported;
+        private const int Rdna4BaseClock = 3450;
+
+        private void ReadOcCaps()
+        {
+            try
+            {
+                var cb = new StringBuilder(64);
+                if (RtCore.rt_oc2_caps(cb, cb.Capacity) == 0)
+                {
+                    var c = cb.ToString().Split('|');
+                    if (c.Length >= 5)
+                    {
+                        _freqAbsolute = c[2] == "1";
+                        _voltAbsolute = c[3] == "1";
+                        _minFreqSupported = c[4] == "1";
+                    }
+                }
+            }
+            catch { }
+        }
 
         private void BuildOcRows()
         {
             OcHost.Children.Clear();
+            ReadOcCaps();
 
-            OcHost.Children.Add(new TextBlock
+            _freqLabel = new TextBlock
             {
-                Text = "核心频率上限（偏移，相对 3450 MHz 默认）",
+                Text = _freqAbsolute ? "核心频率上限（MHz）"
+                                     : "核心频率上限（偏移，相对 3450 MHz 默认）",
                 Foreground = (Brush)FindResource("Text"), FontSize = 12, Margin = new Thickness(0, 4, 0, 2)
-            });
+            };
+            OcHost.Children.Add(_freqLabel);
             _freqText = new TextBlock { Foreground = new SolidColorBrush(Color.FromRgb(0xD8,0x1A,0x1A)),
                                         FontSize = 12, FontFamily = new FontFamily("Consolas") };
             OcHost.Children.Add(_freqText);
@@ -554,6 +582,23 @@ namespace RadeonTune
                                        TickFrequency = 5, Margin = new Thickness(0, 2, 0, 10) };
             _freqSlider.ValueChanged += (_, __) => UpdateOcText();
             OcHost.Children.Add(_freqSlider);
+
+            if (_minFreqSupported)
+            {
+                _minFreqLabel = new TextBlock
+                {
+                    Text = "最低频率（MHz）", Foreground = (Brush)FindResource("Text"),
+                    FontSize = 12, Margin = new Thickness(0, 4, 0, 2)
+                };
+                OcHost.Children.Add(_minFreqLabel);
+                _minFreqText = new TextBlock { Foreground = new SolidColorBrush(Color.FromRgb(0xD8,0x1A,0x1A)),
+                                               FontSize = 12, FontFamily = new FontFamily("Consolas") };
+                OcHost.Children.Add(_minFreqText);
+                _minFreqSlider = new Slider { Minimum = 0, Maximum = 100, IsSnapToTickEnabled = true,
+                                              TickFrequency = 5, Margin = new Thickness(0, 2, 0, 10) };
+                _minFreqSlider.ValueChanged += (_, __) => UpdateOcText();
+                OcHost.Children.Add(_minFreqSlider);
+            }
 
             OcHost.Children.Add(new TextBlock
             {
@@ -568,11 +613,13 @@ namespace RadeonTune
             _powerSlider.ValueChanged += (_, __) => UpdateOcText();
             OcHost.Children.Add(_powerSlider);
 
-            OcHost.Children.Add(new TextBlock
+            _voltLabel = new TextBlock
             {
-                Text = "电压偏移（mV）", Foreground = (Brush)FindResource("Text"),
+                Text = _voltAbsolute ? "核心电压（mV）" : "电压偏移（mV）",
+                Foreground = (Brush)FindResource("Text"),
                 FontSize = 12, Margin = new Thickness(0, 4, 0, 2)
-            });
+            };
+            OcHost.Children.Add(_voltLabel);
             _voltSliderText = new TextBlock { Foreground = new SolidColorBrush(Color.FromRgb(0xD8,0x1A,0x1A)),
                                               FontSize = 12, FontFamily = new FontFamily("Consolas") };
             OcHost.Children.Add(_voltSliderText);
@@ -713,14 +760,58 @@ namespace RadeonTune
             return ok ? (result, remember.IsChecked == true) : (null, false);
         }
 
+        private void RefreshOcValues()
+        {
+            if (_freqSlider == null) return;
+            ReadOcCaps();
+            var sb = new StringBuilder(128);
+            if (RtCore.rt_oc2_info(sb, sb.Capacity) != 0) return;
+            var f = sb.ToString().Split('|');
+            if (f.Length != 6) return;
+            _freqMin = int.Parse(f[0]); _freqMax = int.Parse(f[1]);
+            _powerMin = int.Parse(f[3]); _powerMax = int.Parse(f[4]);
+            _freqSlider.Minimum = _freqMin; _freqSlider.Maximum = _freqMax;
+            _powerSlider.Minimum = _powerMin; _powerSlider.Maximum = _powerMax;
+            _freqSlider.Value = int.Parse(f[2]);
+            _powerSlider.Value = int.Parse(f[5]);
+
+            var mb = new StringBuilder(64);
+            if (_minFreqSupported && _minFreqSlider != null && RtCore.rt_oc2_min(mb, mb.Capacity) == 0)
+            {
+                var mv = mb.ToString().Split('|');
+                if (mv.Length >= 3)
+                {
+                    _minFreqSlider.Minimum = int.Parse(mv[0]);
+                    _minFreqSlider.Maximum = int.Parse(mv[1]);
+                    _minFreqSlider.Value = int.Parse(mv[2]);
+                }
+            }
+            var vb = new StringBuilder(64);
+            if (RtCore.rt_oc2_volt(vb, vb.Capacity) == 0)
+            {
+                var vv = vb.ToString().Split('|');
+                if (vv.Length >= 3)
+                {
+                    _voltSlider.Minimum = int.Parse(vv[0]);
+                    _voltSlider.Maximum = int.Parse(vv[1]);
+                    _voltSlider.Value = int.Parse(vv[2]);
+                    _voltText.Text = $"ADLX 范围 {vv[0]} … {vv[1]} mV";
+                }
+            }
+            UpdateOcText();
+        }
+
         private void UpdateOcText()
         {
             if (_freqText == null) return;
             int off = (int)_freqSlider.Value;
-            int abs = 3450 + off;
-            _freqText.Text = $"{abs} MHz   (offset {off:+#;-#;0})";
+            int abs = _freqAbsolute ? off : Rdna4BaseClock + off;
+            _freqText.Text = _freqAbsolute
+                ? $"{abs} MHz"
+                : $"{abs} MHz   (offset {off:+#;-#;0})";
             _powerText.Text = $"{_powerSlider.Value:+0;-0;0} %";
             if (_voltSliderText != null) _voltSliderText.Text = $"{(int)_voltSlider.Value} mV";
+            if (_minFreqText != null && _minFreqSlider != null) _minFreqText.Text = $"{(int)_minFreqSlider.Value} MHz";
             if (_bandIdeal != null)
             {
                 _bandIdeal.Text = $"{abs} MHz";
@@ -1007,7 +1098,7 @@ namespace RadeonTune
                     g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                     g.Children.Add(new TextBlock
                     {
-                        Text = $"{(pr.AutoApply ? "★ " : "")}{pr.Name}{(string.IsNullOrEmpty(pr.Process) ? "" : "（游戏）")}　频率 {pr.FreqOffset:+#;-#;0} MHz · 电压 {pr.VoltMv} mV · 功耗 {pr.PowerPct:+0;-0;0}% · 风扇 {(!string.IsNullOrEmpty(pr.FanCurve) ? "自定义曲线" : pr.FanPct > 0 ? pr.FanPct + "%" : "自动")}",
+                        Text = $"{(pr.AutoApply ? "★ " : "")}{pr.Name}{(string.IsNullOrEmpty(pr.Process) ? "" : "（游戏）")}　{(_freqAbsolute ? $"频率上限 {pr.FreqOffset} MHz" : $"频率 {pr.FreqOffset:+#;-#;0} MHz")} · 电压 {pr.VoltMv} mV · 功耗 {pr.PowerPct:+0;-0;0}% · 风扇 {(!string.IsNullOrEmpty(pr.FanCurve) ? "自定义曲线" : pr.FanPct > 0 ? pr.FanPct + "%" : "自动")}",
                         Foreground = new SolidColorBrush(Color.FromRgb(0xA1, 0xA1, 0xA6)), FontSize = 11,
                         VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis,
                     });
@@ -1030,6 +1121,8 @@ namespace RadeonTune
                         _freqSlider.Value = pr.FreqOffset;
                         _powerSlider.Value = pr.PowerPct;
                         _voltSlider.Value = pr.VoltMv;
+                        if (_minFreqSupported && _minFreqSlider != null && pr.MinFreq > 0)
+                            _minFreqSlider.Value = pr.MinFreq;
                         if (!string.IsNullOrEmpty(pr.FanCurve))
                         {
                             _fanPts.Clear();
@@ -1142,6 +1235,7 @@ namespace RadeonTune
                     Name = name,
                     HasOc = true,
                     FreqOffset = (int)_freqSlider.Value,
+                    MinFreq = _minFreqSupported && _minFreqSlider != null ? (int)_minFreqSlider.Value : 0,
                     PowerPct = (int)_powerSlider.Value,
                     VoltMv = (int)_voltSlider.Value,
                     FanPct = _fanPts.Count > 0 ? _fanPts[0].v : 0,
@@ -1198,13 +1292,16 @@ namespace RadeonTune
         {
             var b = new StringBuilder(512);
             if (RtCore.rt_od8_limits(b, b.Capacity) != 0 || b.Length == 0) return new Border();
-            var f = b.ToString().Split(' ');
+            var f = b.ToString().Split(' ', StringSplitOptions.RemoveEmptyEntries);
             string Val(string prefix) => f.FirstOrDefault(x => x.StartsWith(prefix + "="))?.Split('=')[1] ?? "—";
+            bool fabs = Val("fabs") == "1";
+            bool vabs = Val("vabs") == "1";
+            bool minsup = Val("minsup") == "1";
 
             var body = new StackPanel();
             body.Children.Add(new TextBlock
             {
-                Text = "驱动限额（OD8 escape 只读）",
+                Text = "驱动可调范围（ADLX 只读）",
                 Foreground = new SolidColorBrush(Color.FromRgb(0x8E, 0x8E, 0x93)),
                 FontSize = 11, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 6),
             });
@@ -1219,12 +1316,10 @@ namespace RadeonTune
                 g.Children.Add(tb);
                 body.Children.Add(g);
             }
-            Line("核心频率范围", $"{Val("fmin")} – {Val("fmax")} MHz");
-            Line("频率偏移允许", $"{Val("foff_min")} – {Val("foff_max")} MHz");
-            Line("功耗上限允许", $"{Val("ppt_min")} – {Val("ppt_max")} %");
-            Line("显存频率范围", $"{Val("uclk_min")} – {Val("uclk_max")} MHz");
-            Line("V/F 分区电压偏移下限", Val("zmin") + " mV");
-            Line("V/F 分区电压偏移上限", Val("zmax") + " mV");
+            Line(fabs ? "核心频率上限范围" : "核心频率偏移范围", $"{Val("freqmin")} – {Val("freqmax")} MHz");
+            if (minsup) Line("最低频率范围", $"{Val("minfreqmin")} – {Val("minfreqmax")} MHz");
+            Line("功耗上限允许", $"{Val("pwrmin")} – {Val("pwrmax")} %");
+            Line(vabs ? "电压范围" : "电压偏移范围", $"{Val("voltmin")} – {Val("voltmax")} mV");
             return new Border
             {
                 Background = new SolidColorBrush(Color.FromRgb(0x26, 0x26, 0x28)),
@@ -1247,6 +1342,7 @@ namespace RadeonTune
                 Name = "oc",
                 HasOc = true,
                 FreqOffset = (int)_freqSlider.Value,
+                MinFreq = _minFreqSupported && _minFreqSlider != null ? (int)_minFreqSlider.Value : 0,
                 PowerPct = (int)_powerSlider.Value,
                 VoltMv = (int)_voltSlider.Value,
             };
@@ -1258,8 +1354,12 @@ namespace RadeonTune
                 int fanRc = RtCore.rt_set_fan_curve(spec);
                 if (fanRc != 0) StatusText.Text = $"风扇曲线写入返回 {fanRc}";
             }
+            string freqTxt = _freqAbsolute
+                ? $"{prof.FreqOffset} MHz（上限）"
+                : $"{Rdna4BaseClock + prof.FreqOffset} MHz（offset {prof.FreqOffset:+#;-#;0}）";
+            string minTxt = prof.MinFreq > 0 ? $"、最低 {prof.MinFreq} MHz" : "";
             StatusText.Text = r.Ok
-                ? $"已应用：{3450 + prof.FreqOffset} MHz（offset {prof.FreqOffset:+#;-#;0}）、功耗 {prof.PowerPct:+0;-0;0}%、电压 {prof.VoltMv} mV（已回读）"
+                ? $"已应用：{freqTxt}{minTxt}、功耗 {prof.PowerPct:+0;-0;0}%、电压 {prof.VoltMv} mV（已回读）"
                 : $"写入失败：{r.Detail}";
         }
 
@@ -1832,6 +1932,7 @@ namespace RadeonTune
                 BuildRows();
                 BuildDisplay();
                 BuildOcRows();
+                RefreshOcValues();
                 BuildProfiles();
                 if (s2.Language == "en") Loc.Apply(this); else Loc.ApplyZh(this);
                 if (StatusText != null) StatusText.Text = Loc.T("语言") + ": " + (s2.Language == "en" ? "English" : "中文");
@@ -2018,7 +2119,8 @@ namespace RadeonTune
                 var parts = new List<string> { $"{kv.Value.Toggles.Count} 项开关" };
                 if (kv.Value.HasOc)
                 {
-                    parts.Add($"频率 {kv.Value.FreqOffset:+#;-#;0} MHz");
+                    ReadOcCaps();
+                    parts.Add(_freqAbsolute ? $"频率上限 {kv.Value.FreqOffset} MHz" : $"频率 {kv.Value.FreqOffset:+#;-#;0} MHz");
                     parts.Add($"功耗 {kv.Value.PowerPct:+0;-0;0}%");
                     parts.Add($"电压 {kv.Value.VoltMv} mV");
                 }
@@ -2065,6 +2167,18 @@ namespace RadeonTune
                     p.PowerPct = int.Parse(f[5]);
                     p.HasOc = true;
                 }
+            }
+            var sv = new StringBuilder(64);
+            if (RtCore.rt_oc2_volt(sv, sv.Capacity) == 0)
+            {
+                var v = sv.ToString().Split('|');
+                if (v.Length >= 3) p.VoltMv = int.Parse(v[2]);
+            }
+            var sm = new StringBuilder(64);
+            if (_minFreqSupported && RtCore.rt_oc2_min(sm, sm.Capacity) == 0)
+            {
+                var m = sm.ToString().Split('|');
+                if (m.Length >= 3) p.MinFreq = int.Parse(m[2]);
             }
 
             var profiles = Engine.LoadProfiles();
@@ -2686,6 +2800,7 @@ namespace RadeonTune
                         BuildRows();
                         BuildDisplay();
                         BuildOcRows();
+                        RefreshOcValues();
                         BuildProfiles();
                         Loc.Apply(this);
                         if (StatusText != null) StatusText.Text = "已切换到 " + name;
@@ -3153,6 +3268,10 @@ namespace RadeonTune
                 string bitsTxt = int.TryParse(dparts[1], out var bp) ? bp switch { 1 => "6", 2 => "8", 3 => "10", 4 => "12", 5 => "14", 6 => "16", _ => "?" } : "?";
                 disptxt = $"{dparts[0]} · {bitsTxt}-bit";
             }
+            // 先探测驱动语义（绝对值 / 偏移、是否支持最低频率），首页与超频页都依赖它
+            ReadOcCaps();
+            if (ClockCaption != null) ClockCaption.Text = Loc.T(_freqAbsolute ? "核心频率上限" : "核心频率");
+            if (VoltCaption != null) VoltCaption.Text = Loc.T(_voltAbsolute ? "GPU 电压" : "电压偏移");
             // 侧栏不再显示设备信息（保留控件占位，避免其它引用失效）
             if (oc.Item1 == 0)
             {
@@ -3160,8 +3279,16 @@ namespace RadeonTune
                 if (f.Length >= 6)
                 {
                     int off = int.Parse(f[2]);
-                    ClockText.Text = (3450 + off).ToString();
-                    ClockSubText.Text = $"offset {off:+#;-#;0}";
+                    if (_freqAbsolute)
+                    {
+                        ClockText.Text = off.ToString();            // RDNA2：ADLX 回读就是 MHz 绝对值
+                        ClockSubText.Text = "频率上限";
+                    }
+                    else
+                    {
+                        ClockText.Text = (Rdna4BaseClock + off).ToString();
+                        ClockSubText.Text = $"offset {off:+#;-#;0}";
+                    }
                     PowerText.Text = $"{int.Parse(f[5]):+0;-0;0}%";
                 }
             }
@@ -3171,7 +3298,7 @@ namespace RadeonTune
                 if (vf.Length >= 13)
             {
                 int off = int.Parse(vf[11]);
-                VoltBigText.Text = off.ToString();   // 负压显示为 -135
+                VoltBigText.Text = off.ToString();   // RDNA4 负压显示为 -135；RDNA2 为绝对 mV
             }
             }
             StatusText.Text = "";
@@ -3188,6 +3315,18 @@ namespace RadeonTune
                     _powerSlider.Minimum = _powerMin; _powerSlider.Maximum = _powerMax;
                     _freqSlider.Value = int.Parse(f[2]);
                     _powerSlider.Value = int.Parse(f[5]);
+                    var mb = new StringBuilder(64);
+                    if (_minFreqSupported && _minFreqSlider != null &&
+                        RtCore.rt_oc2_min(mb, mb.Capacity) == 0)
+                    {
+                        var mv = mb.ToString().Split('|');
+                        if (mv.Length >= 3)
+                        {
+                            _minFreqSlider.Minimum = int.Parse(mv[0]);
+                            _minFreqSlider.Maximum = int.Parse(mv[1]);
+                            _minFreqSlider.Value = int.Parse(mv[2]);
+                        }
+                    }
                     var vb = new StringBuilder(64);
                     if (RtCore.rt_oc2_volt(vb, vb.Capacity) == 0)
                     {

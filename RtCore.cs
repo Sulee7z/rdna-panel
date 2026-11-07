@@ -54,6 +54,17 @@ namespace RadeonTune
         [DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int rt_oc2_volt(StringBuilder buf, int len);
 
+        // v2|v1|freq_abs|volt_abs|minfreq_sup|default_maxfreq|default_volt
+        [DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int rt_oc2_caps(StringBuilder buf, int len);
+
+        // min|max|cur
+        [DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int rt_oc2_min(StringBuilder buf, int len);
+
+        [DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int rt_oc2_set_min(int mhz);
+
         [DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int rt_oc2_set_volt(int mv);
 
