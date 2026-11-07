@@ -1553,6 +1553,18 @@ namespace RadeonTune
             var crBuf = new StringBuilder(4096);
             int crCount = RtCore.rt_customres(crBuf, crBuf.Capacity);
             string crText = crCount <= 0 ? "尚未创建（点击新建）" : $"{crCount} 项（点击新建）";
+
+            static string CrError(int rc) => rc switch
+            {
+                -200 => "该分辨率/刷新率已在自定义列表中",
+                -201 => "系统已支持该模式（无需创建）",
+                -202 => "驱动没有真正添加该模式（列表回读缺失）",
+                -96 => "驱动拒绝该时序：刷新率或像素时钟超过该分辨率上限",
+                -4 => "该显示器/驱动当前不支持自定义分辨率",
+                -2 => "未找到 AMD 显示接口",
+                _ => $"rc={rc}",
+            };
+
             AddDisplayRow("自定义分辨率", crText, () =>
             {
                 var cur = new StringBuilder(512);
@@ -1567,32 +1579,55 @@ namespace RadeonTune
                     dlg.HFront, dlg.VFront, dlg.HSync, dlg.VSync, dlg.HPol, dlg.VPol);
                 if (rc != 0)
                 {
-                    // 驱动可能不接受该时序标准枚举：回退到“自定义/手动”再试一次
-                    rc = RtCore.rt_cr_add_ex(dlg.Width2, dlg.Height2, dlg.Refresh, dlg.Presentation, 4,
-                        dlg.PixelClock, dlg.TimingFlags, dlg.HTotal, dlg.VTotal, dlg.HDisplay, dlg.VDisplay,
-                        dlg.HFront, dlg.VFront, dlg.HSync, dlg.VSync, dlg.HPol, dlg.VPol);
+                    StatusText.Text = $"创建失败：{CrError(rc)}";
+                    BuildDisplay();
+                    return;
                 }
-                StatusText.Text = rc == 0
-                    ? $"已创建 {dlg.Width2}×{dlg.Height2} @ {dlg.Refresh} Hz（可在分辨率下拉中选择）"
-                    : $"创建失败 rc={rc}（时序参数不被驱动接受）";
-                BuildDisplay();
+                // 创建后直接切换，避免“创建了但没生效”的观感；确认框 15 秒不确认会自动回滚
+                ApplyMode(dlg.Width2, dlg.Height2, dlg.Refresh);
             });
+
             if (crCount > 0)
             {
                 var items = crBuf.ToString().Split(';', StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < items.Length; i++)
                 {
                     var parts = items[i].Split(',');
-                    string label = parts.Length >= 3 ? $"{parts[0]} × {parts[1]} @ {parts[2]} Hz" : items[i];
+                    int cw = 0, ch = 0, chz = 0;
+                    bool hasMode = parts.Length >= 3 &&
+                                   int.TryParse(parts[0], out cw) &&
+                                   int.TryParse(parts[1], out ch) &&
+                                   int.TryParse(parts[2], out chz);
+                    string label = hasMode ? $"{parts[0]} × {parts[1]} @ {parts[2]} Hz" : items[i];
                     int delIdx = i;
-                    AddDisplayRow(label, "删除", () =>
+                    if (hasMode)
+                    {
+                        AddDisplayRow(label, "应用", () => ApplyMode(cw, ch, chz));
+                    }
+                    AddDisplayRow("　删除 " + label, "删除", () =>
                     {
                         int rc = RtCore.rt_cr_del(delIdx);
-                        StatusText.Text = rc == 0 ? $"已删除 {label}" : $"删除失败 rc={rc}";
+                        StatusText.Text = rc == 0
+                            ? $"已删除 {label}"
+                            : $"删除失败：{(rc == -96 ? "驱动拒绝删除，列表可能已损坏，请用下方「修复自定义分辨率列表」后重启显卡驱动" : CrError(rc))}";
                         BuildDisplay();
                     });
                 }
             }
+
+            AddDisplayRow("修复自定义分辨率列表", "清理持久化数据", () =>
+            {
+                var ans = MessageBox.Show(this,
+                    "将删除注册表里本显示器的自定义分辨率持久化数据（会先备份到 %LOCALAPPDATA%\\RDNA Panel）。\n\n" +
+                    "清理后需要重启显卡驱动或重启系统才会生效。继续？",
+                    "修复自定义分辨率", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (ans != MessageBoxResult.Yes) return;
+                int n = RtCore.rt_cr_reset(1);
+                StatusText.Text = n >= 0
+                    ? $"已清理 {n} 个持久化条目；请重启显卡驱动或系统后生效"
+                    : $"清理失败 rc={n}（需要管理员权限）";
+                BuildDisplay();
+            });
 
             _curSection = "basic";
             AddDisplayRow("VRR 状态", fsState, null);

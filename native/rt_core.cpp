@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <cstdio>
 #include <cstring>
+#include <cwchar>
 #include <string>
 #include <vector>
 
@@ -1048,8 +1049,12 @@ RT_API int rt_cr_del(int index) {
 
 // 限制：ADLX 只提供 IADLXDisplayResolutionList::Add_Back(IADLXDisplayResolution*)，
 // 但没有"从零构造 IADLXDisplayResolution"的工厂；列表为空时无法克隆出条目。
-// 因此本函数恒返回 -1，界面提示"尚未创建，需先在驱动面板创建一条"。
-// 若将来 ADLX 提供创建接口，在此实现即可（CreateNewResolution 已可用）。
+// Add 通过 GetCurrentAppliedResolution() 克隆当前时序后修改目标字段实现。
+//
+// 额外防护（驱动 1.4 的 CreateNewResolution/DeleteResolution 很挑输入）：
+//   - 已存在的自定义模式直接拒绝（同一 w/h/hz 重复创建会留下删不掉的幽灵条目）
+//   - 系统已原生支持的模式直接拒绝（驱动会返回 INVALID_ARGS）
+//   - 创建后回读列表确认条目真的出现
 RT_API int rt_cr_add_ex(int w, int h, int hz, int presentation, int timingStandard, int pixClock,
                         int tFlags, int hTotal, int vTotal, int hDisp, int vDisp,
                         int hFront, int vFront, int hSync, int vSync, int hPol, int vPol) {
@@ -1058,9 +1063,24 @@ RT_API int rt_cr_add_ex(int w, int h, int hz, int presentation, int timingStanda
 
     IADLXDisplayCustomResolution* cr = nullptr;
     if (g.dsp->GetCustomResolution(g.disp, &cr) != ADLX_OK || !cr) return -2;
-    adlx_bool sup = false;
-    cr->IsSupported(&sup);
-    if (!sup) { cr->Release(); return -4; }
+
+    // 注意：IsSupported 在 ADLX 1.4 上不稳定（已有条目时可能返回 false，但创建仍会成功），
+    // 这里不再用它硬拦截，交给 CreateNewResolution 的返回值判断。
+
+    // 列表里已有同一 w/h/refresh 的条目则拒绝，避免重复创建导致无法删除的幽灵模式
+    IADLXDisplayResolutionList* list0 = nullptr;
+    if (cr->GetResolutionList(&list0) == ADLX_OK && list0) {
+        for (adlx_uint i = 0; i < list0->Size(); i++) {
+            IADLXDisplayResolution* item = nullptr;
+            if (list0->At(i, &item) != ADLX_OK || !item) continue;
+            ADLX_CustomResolution cv{};
+            bool dup = item->GetValue(&cv) == ADLX_OK &&
+                       (int)cv.resWidth == w && (int)cv.resHeight == h && (int)cv.refreshRate == hz;
+            item->Release();
+            if (dup) { list0->Release(); cr->Release(); return -200; }
+        }
+        list0->Release();
+    }
 
     // 取当前生效分辨率作为模板对象（ADLX 未提供从零构造的工厂）
     IADLXDisplayResolution* res = nullptr;
@@ -1092,8 +1112,77 @@ RT_API int rt_cr_add_ex(int w, int h, int hz, int presentation, int timingStanda
 
     ADLX_RESULT rc = cr->CreateNewResolution(res);
     res->Release();
+    if (rc != ADLX_OK) { cr->Release(); return -100 + (int)rc; }
+
+    // 回读确认：列表里必须出现目标模式，否则视为失败（驱动可能静默丢弃）
+    bool found = false;
+    IADLXDisplayResolutionList* list1 = nullptr;
+    if (cr->GetResolutionList(&list1) == ADLX_OK && list1) {
+        for (adlx_uint i = 0; i < list1->Size(); i++) {
+            IADLXDisplayResolution* item = nullptr;
+            if (list1->At(i, &item) != ADLX_OK || !item) continue;
+            ADLX_CustomResolution cv{};
+            if (item->GetValue(&cv) == ADLX_OK &&
+                (int)cv.resWidth == w && (int)cv.resHeight == h && (int)cv.refreshRate == hz) found = true;
+            item->Release();
+            if (found) break;
+        }
+        list1->Release();
+    }
     cr->Release();
-    return rc == ADLX_OK ? 0 : -100 + (int)rc;
+    return found ? 0 : -202;
+}
+
+// 清理驱动持久化的自定义分辨率（DAL3_DATA\common\EDID_*\mode_timing_override）。
+// 驱动 1.4 在列表进入异常状态后 DeleteResolution 会一直返回 INVALID_ARGS，
+// 只能清掉注册表里的持久化数据并重启显卡驱动/系统。
+// 返回删除的条目数；-1 参数/权限错误。
+RT_API int rt_cr_reset(int keepBackup) {
+    const wchar_t* base = L"SYSTEM\\CurrentControlSet\\Control\\Class\\"
+                          L"{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\\DAL3_DATA\\common";
+    HKEY common = nullptr;
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, base, 0, KEY_READ | KEY_WRITE, &common) != ERROR_SUCCESS) return -1;
+
+    wchar_t sub[256];
+    DWORD idx = 0, slen = 256;
+    int removed = 0;
+    while (RegEnumKeyExW(common, idx++, sub, &slen, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS) {
+        slen = 256;
+        if (wcsncmp(sub, L"EDID_", 5) != 0) continue;
+        HKEY k = nullptr;
+        if (RegOpenKeyExW(common, sub, 0, KEY_READ | KEY_WRITE, &k) != ERROR_SUCCESS) continue;
+        DWORD type = 0, size = 0;
+        if (RegQueryValueExW(k, L"mode_timing_override", nullptr, &type, nullptr, &size) == ERROR_SUCCESS &&
+            type == REG_BINARY && size > 0) {
+            if (keepBackup) {
+                std::vector<BYTE> buf(size);
+                DWORD rsize = size;
+                if (!buf.empty() && RegQueryValueExW(k, L"mode_timing_override", nullptr, &type, buf.data(), &rsize) == ERROR_SUCCESS) {
+                    wchar_t path[MAX_PATH] = {0};
+                    DWORD n = GetEnvironmentVariableW(L"LOCALAPPDATA", path, MAX_PATH);
+                    if (n > 0) {
+                        wchar_t dir[MAX_PATH] = {0};
+                        swprintf_s(dir, L"%ls\\RDNA Panel", path);
+                        CreateDirectoryW(dir, nullptr);
+                        wchar_t file[MAX_PATH] = {0};
+                        SYSTEMTIME st; GetLocalTime(&st);
+                        swprintf_s(file, L"%ls\\cr-backup-%04d%02d%02d-%02d%02d%02d.bin",
+                                   dir, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+                        HANDLE hf = CreateFileW(file, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+                        if (hf != INVALID_HANDLE_VALUE) {
+                            DWORD written = 0;
+                            WriteFile(hf, buf.data(), rsize, &written, nullptr);
+                            CloseHandle(hf);
+                        }
+                    }
+                }
+            }
+            if (RegDeleteValueW(k, L"mode_timing_override") == ERROR_SUCCESS) removed++;
+        }
+        RegCloseKey(k);
+    }
+    RegCloseKey(common);
+    return removed;
 }
 
 RT_API int rt_smu_available(char* buf, int len) {

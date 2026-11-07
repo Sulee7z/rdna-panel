@@ -148,6 +148,10 @@ namespace RadeonTune
         [DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int rt_cr_del(int index);
 
+        // 清理驱动持久化的自定义分辨率（DAL3_DATA\common\EDID_*\mode_timing_override）
+        [DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int rt_cr_reset(int keepBackup);
+
         [DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int rt_scale(StringBuilder buf, int len);
 
