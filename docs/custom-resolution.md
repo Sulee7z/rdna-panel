@@ -25,6 +25,19 @@ ADLX 的自定义分辨率接口本身可用，但驱动（1.4）在这个功能
 驱动对“自定义刷新率”的上限与分辨率有关（本机 2560×1440 约 163 Hz、1920×1080 约 200 Hz
 可正常创建并删除；更高刷新率会被拒绝或变成幽灵条目）。这是驱动侧限制，应用无法绕过。
 
+## 根因：对话框返回值
+
+最直接的“无反应”原因不在 ADLX，而在界面：`CustomResDialog` 的“创建”按钮只设置了
+`Accepted = true`，没有设置 WPF 的 `DialogResult`。调用方用的是：
+
+```csharp
+if (dlg.ShowDialog() != true) return;
+```
+
+`Close()` 没有设置 `DialogResult` 时 `ShowDialog()` 返回 `null`，所以创建逻辑**从未执行**。
+现在“创建/取消”都会显式设置 `DialogResult`，并在对话框内增加“该模式已存在”的校验，
+避免用默认值（当前模式）点创建时只得到驱动错误。
+
 ## 修复
 
 `native/rt_core.cpp`：
